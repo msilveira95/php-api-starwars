@@ -1,0 +1,71 @@
+Tabelas:
+CREATE TABLE pessoas (
+    cod_pessoa INT NOT NULL AUTO_INCREMENT,
+    nome_pessoa VARCHAR(255),
+    endereco VARCHAR(255),
+    data_cadastro DATETIME,
+    PRIMARY KEY (cod_pessoa)
+);
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa1','Rua 1','2017-12-09');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa2','Rua 2','2000-01-01');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa3','Rua 3','2005-03-07');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa4','Rua 4','2005-03-08');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa5','Rua 5','2005-05-08');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa6','Rua 6','2009-07-09');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa7','Rua 7','2007-01-09');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa8','Rua 8','2019-11-23');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa9','Rua 9','2018-10-17');
+INSERT INTO pessoas(nome_pessoa,endereco,data_cadastro) VALUES('Pessoa10','Rua 10','2019-01-15');
+
+Obs: status_compra 0 - pendente - 1 pago
+CREATE TABLE financeiro (
+    id INT NOT NULL AUTO_INCREMENT,
+    cod_pessoa INT,
+    data_compra DATETIME,
+    valor_compra DECIMAL(10,2),
+    status_compra INT,
+    PRIMARY KEY (id),
+    FOREIGN KEY fk_cod_pessoa(cod_pessoa)
+    REFERENCES pessoas(cod_pessoa)
+    ON DELETE RESTRICT
+);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (2, '2019-01-03', 1500.12, 1);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (2, '2018-01-03', 10.05, 1);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (2, '2018-01-03', 270.99, 0);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (3, '2017-01-03', 880.21, 1);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (4, '2019-01-03', 1500.13, 1);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (9, '2018-01-03', 727.82, 1);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (8, '2005-01-03', 247.45, 1);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (8, '2019-01-05', 289.43, 1);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (7, '2005-01-04', 821.78, 1);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (7, '2018-12-13', 904.64, 0);
+INSERT INTO financeiro(cod_pessoa,data_compra,valor_compra,status_compra) VALUES (7, '2018-11-29', 971.02, 1);
+
+
+
+Exercicios
+As respostas devem ser em forma de query.
+Exemplo:
+Mostrar todas pessoas
+Resposta: SELECT * FROM pessoa
+
+1 - Mostrar primeiro cliente cadastrado
+    Resposta: SELECT * FROM pessoas LIMIT 1;
+
+2 - Mostrar ultimo cliente cadastrado
+    Resposta: SELECT * FROM pessoas ORDER BY cod_pessoa DESC LIMIT 1;
+
+3 - Mostrar média de compra por cliente, mostrando o nome, valor e data da compra
+    Resposta: --O primeiro select mostra todos os clientes e a média de compras efetuada por eles, o segundo mostra todos os valores gastos, clietes que gastaram e data de compra
+              SELECT AVG(f.valor_compra) AS 'Valor médio de compras', p.nome_pessoa AS Nome FROM financeiro AS f INNER JOIN pessoas AS p ON (f.cod_pessoa=p.cod_pessoa) GROUP BY f.cod_pessoa;
+              SELECT cod_pessoa, valor_compra, data_compra FROM financeiro;
+
+4 - Mostrar clientes que estão devendo, mostrando nome, valor e data da compra
+    Resposta: SELECT p.nome_pessoa AS Nome, f.valor_compra AS 'Valor devedor', f.data_compra AS 'Data da compra' FROM financeiro AS f INNER JOIN pessoas AS p ON (f.cod_pessoa=p.cod_pessoa) WHERE f.status_compra = 0;
+
+5 - Mostrar compra mais antiga, mostrando apenas valor e data da compra
+    Resposta: SELECT data_compra AS 'Data da compra', valor_compra AS VALOR FROM financeiro ORDER BY data_compra LIMIT 1;
+
+6 - Mostrar todas as compras dos clientes pessoa 2 e pessoa 7, substituir o campo status compra pela descrição, lembrando que 0 é pendente e 1 é pago
+    Resposta: SELECT p.nome_pessoa, IF(f.status_compra = 0, 'Pendente', 'Pago') AS Status, f.valor_compra, f.data_compra FROM financeiro AS f INNER JOIN pessoas AS p ON (f.cod_pessoa=p.cod_pessoa) WHERE p.nome_pessoa = 'Pessoa2' OR p.nome_pessoa = 'Pessoa7';
+
